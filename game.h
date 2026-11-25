@@ -8,8 +8,8 @@
 #define MAX_PARTY_SIZE 6
 #define POKEMON_TYPE_COUNT 18
 #define TOTAL_TYPE_EFFECTS 19
-#define ROUND_SUMMARY_LEN 200  // tur ozeti
-#define POKEMON_MOVE_LIMIT 4   // hamle sayisi
+#define ROUND_SUMMARY_LEN 200  
+#define POKEMON_MOVE_LIMIT 4   
 #define ARENA_SIZE 10
 
 typedef struct TypeEffect {
