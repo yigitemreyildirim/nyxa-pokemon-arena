@@ -62,6 +62,15 @@ static Type *findTypeByName(Type types[POKEMON_TYPE_COUNT], const char *typeName
     return NULL;
 }
 
+static const Move *findMoveByName(const Move *moves, int moveCount, const char *moveName) {
+    for (int i = 0; i < moveCount; i++) {
+        if (moves[i].name != NULL && strcmp(moves[i].name, moveName) == 0) {
+            return &moves[i];
+        }
+    }
+    return NULL;
+}
+
 Move *initializeMoves(Type types[POKEMON_TYPE_COUNT], int *outMoveCount) { 
     FILE *filepointer = fopen("moves.txt", "r");
     if (filepointer == NULL) {
@@ -164,4 +173,242 @@ Move *initializeMoves(Type types[POKEMON_TYPE_COUNT], int *outMoveCount) {
     fclose(filepointer);
     *outMoveCount = count;  //kac tane hamle yapildigini bildirmek icin
     return moves;
+}
+
+static void fillTypeEntry(Type *dest, Type types[POKEMON_TYPE_COUNT], const char *typeName) { //tip adina gore default degerler atar 
+    if (strcmp(typeName, "None") == 0) {
+        dest->name = createDynamicString("None");
+        for (int i =  0; i < TOTAL_TYPE_EFFECTS; i++) {  
+            dest->effects[i].atkName = createDynamicString("None");
+            dest->effects[i].defName = createDynamicString("None");
+            dest->effects[i].multiplier = 1.0f;
+        }
+        return;
+    }
+
+    Type *found = findTypeByName(types, typeName);
+    if (found == NULL) {
+        fprintf(stderr, "Unknown type '%s' in pokemons.txt\n", typeName);
+        exit(EXIT_FAILURE);
+    }
+
+    dest->name = createDynamicString(found->name); // pokemonun tipini bulup dinamik kopyalayıp hedef pokemonun tipine kaydediyor 
+    for (int i= 0; i < TOTAL_TYPE_EFFECTS; i++) {
+        dest->effects[i].atkName = createDynamicString(found->effects[i].atkName);
+        dest->effects[i].defName = createDynamicString(found->effects[i].defName);
+        dest->effects[i].multiplier = found->effects[i].multiplier;
+    }
+}
+
+Pokemon *initializePokemons(Type types[POKEMON_TYPE_COUNT], Move *moves, int moveCount, int *outPokemonCount) {
+    FILE *filepointer = fopen("pokemons.txt", "r");
+    if (filepointer == NULL) {
+        fprintf(stderr, "Could not open pokemons.txt\n");
+        exit(EXIT_FAILURE);
+    }
+
+    Pokemon *pokemons = NULL;
+    int count =  0;
+    char line[512];
+
+    while (fgets(line, sizeof(line), filepointer) != NULL) {
+        line[strcspn(line, "\r\n")] = '\0';
+        if (line[0] == '\0') {
+            continue;
+        }
+
+        // Format: Name|Type1|Type2|MaxHP|Attack|Defense|SpAtk|SpDef|Speed|Move1|
+        char *p1 = strchr(line, '|');
+        if (p1 == NULL) {
+            fprintf(stderr, "Invalid pokemon format in pokemons.txt: %s\n", line);  //ozelliklerin eksiklik kontrolleri
+            fclose(filepointer);
+            exit(EXIT_FAILURE);
+        }
+        *p1 = '\0';
+        const char *pokeName = line;
+
+        char *type1Str = p1 + 1;
+        char *p2 = strchr(type1Str, '|');
+        if (p2 == NULL) {
+            fprintf(stderr, "Missing Type2 in pokemons.txt: %s\n", pokeName);
+            fclose(filepointer);
+            exit(EXIT_FAILURE);
+        }
+        *p2 = '\0';
+
+        char *type2Str = p2 + 1;
+        char *p3 = strchr(type2Str, '|');
+        if (p3 == NULL) {
+            fprintf(stderr, "Missing MaxHP in pokemons.txt: %s\n", pokeName);
+            fclose(filepointer);
+            exit(EXIT_FAILURE);
+        }
+        *p3 = '\0';
+
+        char *hpStr = p3 + 1;
+        char *p4 = strchr(hpStr, '|');
+        if (p4 == NULL) {
+            fprintf(stderr, "Missing Attack in pokemons.txt: %s\n", pokeName);
+            fclose(filepointer);
+            exit(EXIT_FAILURE);
+        }
+        *p4 = '\0';
+
+        char *atkStr = p4 + 1;
+        char *p5 = strchr(atkStr, '|');
+        if (p5 == NULL) {
+            fprintf(stderr, "Missing Defense in pokemons.txt: %s\n", pokeName);
+            fclose(filepointer);
+            exit(EXIT_FAILURE);
+        }
+        *p5 = '\0';
+
+        char *defStr = p5 + 1;
+        char *p6 = strchr(defStr, '|');
+        if (p6 == NULL) {
+            fprintf(stderr, "Missing SpAtk in pokemons.txt: %s\n", pokeName);
+            fclose(filepointer);
+            exit(EXIT_FAILURE);
+        }
+        *p6 = '\0';
+
+        char *spAtkStr = p6 + 1;
+        char *p7 = strchr(spAtkStr, '|');
+        if (p7 == NULL) {
+            fprintf(stderr, "Missing SpDef in pokemons.txt: %s\n", pokeName);
+            fclose(filepointer);
+            exit(EXIT_FAILURE);
+        }
+        *p7 = '\0';
+
+        char *spDefStr = p7 + 1;
+        char *p8 = strchr(spDefStr, '|');
+        if (p8 == NULL) {
+            fprintf(stderr, "Missing Speed in pokemons.txt: %s\n", pokeName);
+            fclose(filepointer);
+            exit(EXIT_FAILURE);
+        }
+        *p8 = '\0';
+
+        char *spdStr = p8 + 1;
+        char *p9 = strchr(spdStr, '|');
+        if (p9 == NULL) {
+            fprintf(stderr, "Missing moves in pokemons.txt: %s\n", pokeName);
+            fclose(filepointer);
+            exit(EXIT_FAILURE);
+        }
+        *p9 = '\0';
+
+        Pokemon *resized = realloc(pokemons, (size_t)(count + 1) * sizeof(Pokemon));
+        if (resized == NULL) {
+            fprintf(stderr, "Memory allocation failed while reading pokemons.txt\n");
+            free(pokemons);
+            fclose(filepointer);
+            exit(EXIT_FAILURE);
+        }
+        pokemons = resized;
+
+        Pokemon *current = &pokemons[count];
+        memset(current, 0, sizeof(Pokemon)); // yanlis verilerle karsilasmamak icin verileri temizledim
+
+        current->name = createDynamicString(pokeName);
+        fillTypeEntry(&current->types[0], types, type1Str); // ana tipi
+        fillTypeEntry(&current->types[1], types, type2Str); // yna ozelligi
+
+        current->maxHP = atoi(hpStr);  //stringleri sayiya cevirme
+        current->currentHP = current->maxHP;
+        current->attack = atoi(atkStr);
+        current->defense = atoi(defStr);
+        current->spAtk = atoi(spAtkStr);
+        current->spDef = atoi(spDefStr);
+        current->speed = atoi(spdStr);
+
+        char *cursor = p9 + 1;
+        int moveIdx = 0;
+        while (cursor != NULL && *cursor != '\0') { //imlec degiskeniyle pipe ile ayirdigimiz stringi gezip hamleleri kaydetmek icin yaptim
+            if (moveIdx >= POKEMON_MOVE_LIMIT) {
+                fprintf(stderr, "Too many moves for pokemon '%s'\n", pokeName);
+                fclose(filepointer);
+                exit(EXIT_FAILURE);
+            }
+            char *nextPipe = strchr(cursor, '|');
+            if (nextPipe != NULL) {
+                *nextPipe = '\0';
+            }
+
+            const Move *foundMove = findMoveByName(moves, moveCount, cursor);  // yapilan hamleyi buluyor
+            if (foundMove == NULL) {
+                fprintf(stderr, "Unknown move '%s' for pokemon '%s'\n", cursor, pokeName);
+                fclose(filepointer);
+                exit(EXIT_FAILURE);
+            }
+
+            current->moves[moveIdx] = *foundMove;
+            current->moves[moveIdx].name = createDynamicString(foundMove->name);
+            moveIdx++;
+
+            if (nextPipe != NULL) {
+                cursor = nextPipe + 1;
+            }else {
+                cursor = NULL;
+            }
+         }
+
+        count++;
+    }
+
+    fclose(filepointer);
+    *outPokemonCount = count;
+    return pokemons;
+}
+
+void freePokemons(Pokemon *pokemons, int pokemonCount) { //pokemonlarla isimiz bittiginde bellegi geri teslim icin
+    if (pokemons == NULL) {
+        return;
+    }
+
+    for (int i = 0; i < pokemonCount; i++) {
+        free(pokemons[i].name);
+
+        for (int t = 0; t < 2; t++) {
+            free(pokemons[i].types[t].name);
+            for (int j = 0; j < TOTAL_TYPE_EFFECTS; j++) {
+                free(pokemons[i].types[t].effects[j].atkName);
+                free(pokemons[i].types[t].effects[j].defName);
+            }
+        }
+
+        for (int m = 0; m < POKEMON_MOVE_LIMIT; m++) {
+            free(pokemons[i].moves[m].name);
+        }
+    }
+
+    free(pokemons);
+}
+
+void freeTypes(Type types[POKEMON_TYPE_COUNT]) {// bir turun diger ture dayanikliligi icin kullandigimiz type'i isimiz bittiginde bellegi geri teslim icin
+    if (types == NULL) {
+        return;
+    }
+
+    for (int i = 0; i < POKEMON_TYPE_COUNT; i++) {
+        free(types[i].name);
+
+        for (int j = 0; j < TOTAL_TYPE_EFFECTS; j++) {
+            free(types[i].effects[j].atkName);
+            free(types[i].effects[j].defName);
+        }
+    }
+}
+
+void freeMoves(Move *moves, int moveCount) { // salddiri turlerini isimiz bittiginde bellege teslim
+    if (moves == NULL) {
+        return;
+    }
+
+    for (int i = 0; i < moveCount; i++) {
+        free(moves[i].name);
+    }
+
+    free(moves);
 }

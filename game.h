@@ -69,5 +69,11 @@ typedef struct RoundLog {
 // baslatmak icin
 void initializeTypes(Type types[POKEMON_TYPE_COUNT]);
 Move *initializeMoves(Type types[POKEMON_TYPE_COUNT], int *outMoveCount);
+Pokemon *initializePokemons(Type types[POKEMON_TYPE_COUNT], Move *moves, int moveCount, int *outPokemonCount);
+
+// bellek temizleme icin
+void freePokemons(Pokemon *pokemons, int pokemonCount);
+void freeTypes(Type types[POKEMON_TYPE_COUNT]);
+void freeMoves(Move *moves, int moveCount);
 
 #endif

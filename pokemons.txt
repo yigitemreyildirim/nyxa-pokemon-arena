@@ -1,0 +1,2 @@
+Bulbasaur|Grass|Poison|45|49|49|65|65|45|Rock Slide|Tackle
+Charmander|Fire|None|39|52|43|60|50|65|Flamethrower|Tackle
