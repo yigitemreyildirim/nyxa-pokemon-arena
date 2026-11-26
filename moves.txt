@@ -1,0 +1,4 @@
+Flamethrower|Fire|SPECIAL|90|3
+Tackle|Normal|PHYSICAL|40|1
+Hydro Pump|Water|SPECIAL|110|4
+Rock Slide|Rock|PHYSICAL|75|2

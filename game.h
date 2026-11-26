@@ -30,7 +30,7 @@ typedef enum AttackType {
 
 typedef struct Move {
     char *name;
-    Type type;
+    Type *type;
     AttackType category;
     int power;
     int range;
