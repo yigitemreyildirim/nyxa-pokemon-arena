@@ -1,2 +1,6 @@
 Bulbasaur|Grass|Poison|45|49|49|65|65|45|Rock Slide|Tackle
 Charmander|Fire|None|39|52|43|60|50|65|Flamethrower|Tackle
+Squirtle|Water|None|44|48|65|50|64|43|Tackle
+Pikachu|Electric|None|35|55|40|50|50|90|Tackle
+Geodude|Rock|Ground|40|80|100|30|30|20|Rock Slide|Tackle
+Pidgey|Normal|Flying|40|45|40|35|35|56|Tackle

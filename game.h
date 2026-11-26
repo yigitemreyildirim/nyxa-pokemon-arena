@@ -66,10 +66,14 @@ typedef struct RoundLog {
     char summary[ROUND_SUMMARY_LEN];
 } RoundLog;
 
-// baslatmak icin
+// verileri yuklemek icin
 void initializeTypes(Type types[POKEMON_TYPE_COUNT]);
 Move *initializeMoves(Type types[POKEMON_TYPE_COUNT], int *outMoveCount);
 Pokemon *initializePokemons(Type types[POKEMON_TYPE_COUNT], Move *moves, int moveCount, int *outPokemonCount);
+
+// oyunu baslatmak icin
+void initialize(Type types[POKEMON_TYPE_COUNT],Move **moves, int *outMoveCount,Pokemon **pokemons, int *outPokemonCount,Player *player1, Player *player2);
+
 
 // bellek temizleme icin
 void freePokemons(Pokemon *pokemons, int pokemonCount);

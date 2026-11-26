@@ -412,3 +412,48 @@ void freeMoves(Move *moves, int moveCount) { // salddiri turlerini isimiz bittig
 
     free(moves);
 }
+
+void initialize(Type types[POKEMON_TYPE_COUNT], Move **moves, int *outMoveCount,Pokemon **pokemons, int *outPokemonCount,Player *player1, Player *player2) {
+    initializeTypes(types);
+    *moves = initializeMoves(types, outMoveCount);
+    *pokemons = initializePokemons(types, *moves, *outMoveCount, outPokemonCount);
+
+    player1->name = "Player 1";
+    player2->name = "Player 2";
+
+    int chosen1[MAX_PARTY_SIZE] = {0};
+    int chosen2[MAX_PARTY_SIZE] = {0};
+
+    for (int i = 0; i < MAX_PARTY_SIZE; i++) {
+        int index1, duplicate1;  // duplicate degiskeni ayni pokemonu bir daha secemesin diye index1 sectigi pokemon
+        do {
+            index1 = rand() % (*outPokemonCount);  // pokemon sayisi -1 kadar bir sayi uretir 
+            duplicate1 = 0;
+            for (int j = 0; j < i; j++) {
+                if (chosen1[j] == index1) duplicate1 = 1;
+            }
+        } while (duplicate1);
+        chosen1[i] = index1;
+        player1->Pokemons[i] = (*pokemons)[index1];
+
+        int index2, duplicate2;
+        do {
+            index2 = rand() % (*outPokemonCount);
+            duplicate2 = 0;
+            for (int j = 0; j < i; j++) {
+                if (chosen2[j] == index2) duplicate2 = 1;
+            }
+        } while (duplicate2);
+        chosen2[i] = index2;
+        player2->Pokemons[i] = (*pokemons)[index2];
+    }
+
+    player1->currentIndex = 1;
+    player2->currentIndex = 1;
+
+    player1->position.x = 0;
+    player1->position.y = 4;
+
+    player2->position.x = 9;
+    player2->position.y = 4;
+}
