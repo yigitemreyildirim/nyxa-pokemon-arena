@@ -66,4 +66,8 @@ typedef struct RoundLog {
     char summary[ROUND_SUMMARY_LEN];
 } RoundLog;
 
+// baslatmak icin
+void initializeTypes(Type types[POKEMON_TYPE_COUNT]);
+Move *initializeMoves(Type types[POKEMON_TYPE_COUNT], int *outMoveCount);
+
 #endif
