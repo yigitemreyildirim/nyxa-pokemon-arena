@@ -128,6 +128,7 @@ Move *initializeMoves(Type types[POKEMON_TYPE_COUNT], int *outMoveCount) {
         *p4 = '\0';
 
         const char *rangeStr = p4 + 1;
+        (void)rangeStr; // range kategoriye gore ataniyor
 
         Type *matchedType = findTypeByName(types, typeStr);
         if (matchedType == NULL) {
@@ -137,18 +138,20 @@ Move *initializeMoves(Type types[POKEMON_TYPE_COUNT], int *outMoveCount) {
         }
 
         AttackType category;
-        if (strcmp(catStr, "PHYSICAL") == 0) { //hamle kategori kontrolu
+        int range = 0;
+        if (strcmp(catStr, "PHYSICAL") == 0) { //fizikselse range 2 
             category = PHYSICAL_DAMAGE;
-        } else if (strcmp(catStr, "SPECIAL") == 0) {
+            range = 2;
+        } else if (strcmp(catStr, "SPECIAL") == 0) { // ozelse range 4
             category = SPECIAL_DAMAGE;
+            range = 4;
         } else {
             fprintf(stderr, "Invalid category '%s' for move '%s'\n", catStr, moveName);
             fclose(filepointer);
             exit(EXIT_FAILURE);
         }
 
-        int power = atoi(powerStr); //stringleri integere cevirdim
-        int range = atoi(rangeStr);
+        int power = atoi(powerStr);
 
         Move *resized = realloc(moves, (size_t)(count + 1) * sizeof(Move)); // dinamik array icin alan belirleme
         if (resized == NULL) {
@@ -438,7 +441,7 @@ void initialize(Type types[POKEMON_TYPE_COUNT], Move **moves, int *outMoveCount,
 
         int index2, duplicate2;
         do {
-            index2 = rand() % (*outPokemonCount);
+            index2 = rand() % (*outPokemonCount); //pokemon sayisi kadar random sayi ureticek
             duplicate2 = 0;
             for (int j = 0; j < i; j++) {
                 if (chosen2[j] == index2) duplicate2 = 1;
