@@ -24,6 +24,8 @@ int main(void) {
         printf("  [%d] %s\n", i, player2.Pokemons[i].name);
     }
 
+    printBoard(&player1, &player2);
+
     freePokemons(pokemons, pokemonCount);
     freeMoves(moves, moveCount);
     freeTypes(types);

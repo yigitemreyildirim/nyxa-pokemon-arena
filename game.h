@@ -71,6 +71,10 @@ void initializeTypes(Type types[POKEMON_TYPE_COUNT]);
 Move *initializeMoves(Type types[POKEMON_TYPE_COUNT], int *outMoveCount);
 Pokemon *initializePokemons(Type types[POKEMON_TYPE_COUNT], Move *moves, int moveCount, int *outPokemonCount);
 
+// tahta ve mesafe fonksiyonlari
+int calculateDistance(Position pos1, Position pos2);
+void printBoard(const Player *player1, const Player *player2);
+
 // oyunu baslatmak icin
 void initialize(Type types[POKEMON_TYPE_COUNT],Move **moves, int *outMoveCount,Pokemon **pokemons, int *outPokemonCount,Player *player1, Player *player2);
 
