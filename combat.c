@@ -45,7 +45,7 @@ int isValidMoveTarget(const Player *player, const Player *otherPlayer, Position 
     }
 
     int dist = calculateDistance(player->position, target);
-    if (dist < 1 || dist > 3) { //2 blockluk mesafede degilse engellemek icin
+    if (dist < 1 || dist > 3) { //1-3 blockluk mesafede degilse engellemek icin
         return 0;
     }
 
